@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 	"whattoday/web-service-gin/quotes"
+	"whattoday/web-service-gin/users"
 
 	"github.com/gin-gonic/gin"
 	_ "modernc.org/sqlite"
@@ -36,6 +37,8 @@ func main() {
 
 	quotesSqlite := quotes.NewQuotesSqlite(db)
 	quotesSqlite.CreateTable()
+	usersSqlite := users.NewUserSqlite(db)
+	usersSqlite.CreateTable()
 
 	router := gin.Default()
 	router.GET("/quotes", func(c *gin.Context) {
@@ -44,9 +47,14 @@ func main() {
 	router.POST("quotes", func(c *gin.Context) {
 		addQuote(c, quotesSqlite)
 	})
+	router.POST("users", func(c *gin.Context){
+
+	})
 
 	router.Run("localhost:8080")
 }
+
+//func addUser(c *gin.Context)
 
 func getQuotes(c *gin.Context, quotesDao quotes.QuotesDao) {
 	quotes, err := quotesDao.GetQuotes()
@@ -58,6 +66,7 @@ func getQuotes(c *gin.Context, quotesDao quotes.QuotesDao) {
 }
 
 func addQuote(c *gin.Context, quotesDao quotes.QuotesDao) {
+	
 	var newQuote quotes.Quote
 	if err := c.BindJSON(&newQuote); err != nil {
 		return

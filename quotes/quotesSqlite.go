@@ -45,10 +45,7 @@ func (q QuotesSqlite) GetQuotes() ([]Quote, error) {
 func (q QuotesSqlite) AddQuote(quote Quote) error {
 	db := q.db
 
-	stmt, err := db.Prepare(`INSERT INTO quotes (text, publishDate)  VALUES (?,?)`)
-
-	fmt.Print("CACA")
-	fmt.Print(stmt)
+	stmt, err := db.Prepare(`INSERT INTO quotes (text, user, publishDate)  VALUES (?,?,?)`)
 
 	if err != nil {
 		return err
@@ -56,7 +53,7 @@ func (q QuotesSqlite) AddQuote(quote Quote) error {
 	defer stmt.Close()
 
 	// Execute the statement with the quote's text
-	_, err = stmt.Exec(quote.Text, quote.PublishDate)
+	_, err = stmt.Exec(quote.Text, quote.User, quote.PublishDate)
 	if err != nil {
 		return err
 	}
@@ -72,7 +69,9 @@ func (q QuotesSqlite) CreateTable() {
 	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS quotes (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		text TEXT,
-		publishDate DATETIME
+		publishDate DATETIME,
+		userId INTEGER,
+		FOREIGN KEY (userId) REFERENCES users(id)
 	)`)
 	if err != nil {
 		log.Fatal(err)
