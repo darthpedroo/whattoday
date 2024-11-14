@@ -1,23 +1,22 @@
 package quotes
 
-import ("time"
-	api "whattoday/web-service-gin/users")
-
+import (
+	"time"
+)
 
 type Quote struct {
-	Id int
-	Text string
-	User api.User
+	Id          int
+	Text        string
+	UserId      int
 	PublishDate time.Time
-
 }
 
-func NewQuote(id int, text string, user api.User, publishDate time.Time) Quote {
+func NewQuote(id int, text string, userId int, publishDate time.Time) Quote {
 
 	return Quote{
-		Id: id,
-		Text: text,
-		User: user,
+		Id:          id,
+		Text:        text,
+		UserId:      userId,
 		PublishDate: publishDate,
 	}
 }

@@ -15,6 +15,7 @@ import (
 
 func connectDb() *sql.DB {
 	db, err := sql.Open("sqlite", "./example.db")
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -47,14 +48,12 @@ func main() {
 	router.POST("quotes", func(c *gin.Context) {
 		addQuote(c, quotesSqlite)
 	})
-	router.POST("users", func(c *gin.Context){
+	router.POST("users", func(c *gin.Context) {
 
 	})
 
 	router.Run("localhost:8080")
 }
-
-//func addUser(c *gin.Context)
 
 func getQuotes(c *gin.Context, quotesDao quotes.QuotesDao) {
 	quotes, err := quotesDao.GetQuotes()
@@ -66,7 +65,7 @@ func getQuotes(c *gin.Context, quotesDao quotes.QuotesDao) {
 }
 
 func addQuote(c *gin.Context, quotesDao quotes.QuotesDao) {
-	
+
 	var newQuote quotes.Quote
 	if err := c.BindJSON(&newQuote); err != nil {
 		return
@@ -74,6 +73,9 @@ func addQuote(c *gin.Context, quotesDao quotes.QuotesDao) {
 
 	newQuote.PublishDate = time.Now()
 
-	quotesDao.AddQuote(newQuote)
+	if err := quotesDao.AddQuote(newQuote); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	c.IndentedJSON(http.StatusCreated, newQuote)
 }

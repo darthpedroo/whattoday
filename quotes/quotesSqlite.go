@@ -44,16 +44,17 @@ func (q QuotesSqlite) GetQuotes() ([]Quote, error) {
 
 func (q QuotesSqlite) AddQuote(quote Quote) error {
 	db := q.db
+	
+	fmt.Print("Big Futa! ")
 
-	stmt, err := db.Prepare(`INSERT INTO quotes (text, user, publishDate)  VALUES (?,?,?)`)
+	stmt, err := db.Prepare(`INSERT INTO quotes (text, userId, publishDate)  VALUES (?,?,?)`)
 
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	// Execute the statement with the quote's text
-	_, err = stmt.Exec(quote.Text, quote.User, quote.PublishDate)
+	_, err = stmt.Exec(quote.Text, quote.UserId, quote.PublishDate)
 	if err != nil {
 		return err
 	}
