@@ -24,7 +24,7 @@ func (q QuotesSqlite) GetQuotes() ([]Quote, error) {
 	for rows.Next() {
 		var quote Quote
 		// se escanea el espacio de memoria pq la respuesta es algo asi: // Return error if scanning fails
-		if err := rows.Scan(&quote.Id, &quote.Text); err != nil {
+		if err := rows.Scan(&quote.Id, &quote.Text, &quote.PublishDate, &quote.UserId); err != nil {
 			log.Printf("Error scanning quote: %v", err)
 			return nil, err
 		}
