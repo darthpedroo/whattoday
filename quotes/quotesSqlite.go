@@ -2,7 +2,6 @@ package quotes
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 )
 
@@ -36,16 +35,12 @@ func (q QuotesSqlite) GetQuotes() ([]Quote, error) {
 		return nil, err
 	}
 
-	fmt.Println(rows)
-
 	return quotes, nil
 
 }
 
 func (q QuotesSqlite) AddQuote(quote Quote) error {
 	db := q.db
-	
-	fmt.Print("Big Futa! ")
 
 	stmt, err := db.Prepare(`INSERT INTO quotes (text, userId, publishDate)  VALUES (?,?,?)`)
 
@@ -59,7 +54,6 @@ func (q QuotesSqlite) AddQuote(quote Quote) error {
 		return err
 	}
 
-	fmt.Println("New quote inserted successfully!")
 	return nil
 
 }
