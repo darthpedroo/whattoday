@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 	"whattoday/web-service-gin/quotes"
 	"whattoday/web-service-gin/users"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 	_ "modernc.org/sqlite"
 )
 
@@ -31,7 +34,6 @@ func connectDb() *sql.DB {
 }
 
 func main() {
-
 	db := connectDb()
 	defer db.Close()
 	fmt.Println(db)
@@ -50,7 +52,9 @@ func main() {
 	})
 	router.POST("/users", func(c *gin.Context) {
 		addUser(c, usersSqlite)
-
+	})
+	router.POST("login", func(c* gin.Context) {
+		Login(c, usersSqlite)
 	})
 
 	router.Run("localhost:8080")
@@ -81,14 +85,9 @@ func addQuote(c *gin.Context, quotesDao quotes.QuotesDao) {
 	c.IndentedJSON(http.StatusCreated, newQuote)
 }
 
-func addUser(c *gin.Context, userDao users.UserDao){ 
+func addUser(c *gin.Context, userDao users.UserDao) {
 
 	var newUser users.User
-
-	userIP := c.ClientIP()
-
-	fmt.Println(userIP)
-
 
 	if err := c.BindJSON(&newUser); err != nil {
 		return
@@ -99,4 +98,56 @@ func addUser(c *gin.Context, userDao users.UserDao){
 		return
 	}
 	c.IndentedJSON(http.StatusCreated, newUser)
+}
+
+func Login(c *gin.Context, userDao users.UserDao) {
+
+	// get the user and password of the req body
+	var newUser users.User
+
+	if err := c.BindJSON(&newUser); err != nil {
+		return
+	}
+
+	// look up requested user
+	currentUserFromDb, err := userDao.GetUser(newUser.Id)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	//Compare sent in pass with saved user pass hash
+	fmt.Println("XD")
+	fmt.Println(currentUserFromDb.Password)
+
+	err = bcrypt.CompareHashAndPassword([]byte(currentUserFromDb.Password), []byte(newUser.Password))
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Generate  a jwt token
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": currentUserFromDb.Id,
+		"name": currentUserFromDb.Name,
+		"exp:": time.Now().Add(time.Hour).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("Authorization", tokenString,3600,"","",false,true)
+
+	c.JSON(http.StatusOK, gin.H{
+		"token": tokenString,
+	})
+
 }

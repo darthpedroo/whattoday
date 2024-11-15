@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserSqlite struct {
@@ -40,20 +42,45 @@ func (u UserSqlite) GetUsers() ([]User, error) {
 }
 
 func (u UserSqlite) AddUser(user User) error {
-	
+
 	db := u.db
-	stmt, err := db.Prepare(`INSERT INTO users (name) VALUES (?)`)
+	stmt, err := db.Prepare(`INSERT INTO users (name,password)  VALUES (?,?) `)
 
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(user.Name)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+
+	_, err = stmt.Exec(user.Name, hashedPassword)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (u UserSqlite) GetUser(userId int) (User, error) {
+
+	db := u.db
+	row, err := db.Query(`SELECT * FROM users where id = ?`, userId)
+	
+	var user User
+	for row.Next() {
+		
+
+		if err := row.Scan(&user.Id, &user.Name, &user.Password); err != nil {
+			log.Printf("Error scanning User: %v", err)
+			return User{}, err
+		}
+	}
+
+	if err != nil {
+		log.Fatal(err)
+		return User{}, err
+	}
+	return user, nil
+
 }
 
 func UserCanPost(db *sql.DB, userId int) (bool, time.Duration, error) {
@@ -101,7 +128,8 @@ func (u UserSqlite) CreateTable() {
 
 	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS users (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	name TEXT)`)
+	name TEXT,
+	password TEXT)`)
 
 	if err != nil {
 		log.Fatal(err)
