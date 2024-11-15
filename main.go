@@ -74,25 +74,18 @@ func getQuotes(c *gin.Context, quotesDao quotes.QuotesDao) {
 
 func addQuote(c *gin.Context, quotesDao quotes.QuotesDao) {
 
-	// Retrieve the user from the context
 	user, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
 		return
 	}
 
-	// Print the value and type of the user to debug
-	fmt.Printf("user: %v\n", user)        // Prints the user data
-	fmt.Printf("user type: %T\n", user)   // Prints the actual type of user
-
-	// Type assert the user to a pointer of your User struct
 	authenticatedUser, ok := user.(users.User)
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User data is incorrect"})
 		return
 	}
 
-	// Now you can access the UserId (or Id in your case)
 	userId := authenticatedUser.Id
 	fmt.Println("Authenticated UserId:", userId)
 
@@ -162,7 +155,6 @@ func Login(c *gin.Context, userDao users.UserDao) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub":  currentUserFromDb.Id,
 		"name": currentUserFromDb.Name,
-		"password": currentUserFromDb.Password,
 		"exp": time.Now().Add(time.Hour).Unix(),
 	})
 
