@@ -15,21 +15,40 @@ func NewQuotesSqlite(db *sql.DB) *QuotesSqlite {
 	return &QuotesSqlite{db: db}
 }
 
-func (q QuotesSqlite) GetQuotes() ([]Quote, error) {
+func (q QuotesSqlite) GetQuotes() ([]CustomQuoteResponse, error) {
+
+	
+
 	db := q.db
 
-	var quotes = make([]Quote, 0)
+	//var quotes = make([]Quote, 0)
+	//var usersList = make([]users.User, 0)
 
-	rows, err := db.Query(`SELECT * FROM quotes`)
+	rows, err := db.Query(`select q.id,q.text,q.publishDate,q.userId, u.id, u.name from quotes q 
+						join users u on q.userId = u.id `)
+
+	var response []CustomQuoteResponse
 
 	for rows.Next() {
+		
 		var quote Quote
+		var user users.User
+
 		// se escanea el espacio de memoria pq la respuesta es algo asi: // Return error if scanning fails
-		if err := rows.Scan(&quote.Id, &quote.Text, &quote.PublishDate, &quote.UserId); err != nil {
+		if err := rows.Scan(&quote.Id, &quote.Text, &quote.PublishDate, &quote.UserId, &user.Id, &user.Name); err != nil {
 			log.Printf("Error scanning quote: %v", err)
 			return nil, err
 		}
-		quotes = append(quotes, quote)
+		
+		customResponse := CustomQuoteResponse{
+			Quote: quote,
+			User:  user,
+		}
+
+		response = append(response, customResponse)
+		
+		//quotes = append(quotes, quote)
+		//usersList = append(usersList, user)
 	}
 
 	if err != nil {
@@ -37,19 +56,13 @@ func (q QuotesSqlite) GetQuotes() ([]Quote, error) {
 		return nil, err
 	}
 
-	return quotes, nil
-
+	return response, nil
 }
 
 func (q QuotesSqlite) AddQuote(quote Quote) error {
 	db := q.db
 
 	canPost, hoursUntilNextPost, err := users.UserCanPost(db, quote.UserId)
-	
-	fmt.Println("CAN POST: ")
-	fmt.Println(canPost)
-	fmt.Println("HOURS UNTIL NEXT POST")
-	fmt.Println(hoursUntilNextPost)
 
 	if !canPost {
 		return fmt.Errorf("user cannot post yet, hours till next post: %v", hoursUntilNextPost)
