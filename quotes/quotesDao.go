@@ -1,6 +1,6 @@
 package quotes
 
 type QuotesDao interface {
-	GetQuotes() ([]Quote , error)
+	GetQuotes() ([]CustomQuoteResponse , error)
 	AddQuote(quote Quote) error
 }

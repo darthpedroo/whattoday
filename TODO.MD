@@ -9,4 +9,4 @@ JWT
 [] las routes de post no hace falta que devuelvan una struct, pueden devolver un status Created !
 
 
- 
+compiledaemon --command="./whattoday/web-service-gin"

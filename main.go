@@ -11,6 +11,7 @@ import (
 	"whattoday/web-service-gin/quotes"
 	"whattoday/web-service-gin/users"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -45,6 +46,16 @@ func main() {
 	usersSqlite.CreateTable()
 
 	router := gin.Default()
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowMethods = []string{"POST", "GET", "PUT", "OPTIONS"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept", "User-Agent", "Cache-Control", "Pragma"}
+	config.ExposeHeaders = []string{"Content-Length"}
+	config.AllowCredentials = true
+	config.MaxAge = 12 * time.Hour
+
+	router.Use(cors.New(config))
+
 	router.GET("/quotes", func(c *gin.Context) {
 		getQuotes(c, quotesSqlite)
 	})
@@ -89,13 +100,10 @@ func addQuote(c *gin.Context, quotesDao quotes.QuotesDao) {
 	userId := authenticatedUser.Id
 	fmt.Println("Authenticated UserId:", userId)
 
-
 	var newQuote quotes.Quote
 	if err := c.BindJSON(&newQuote); err != nil {
 		return
 	}
-
-	
 
 	newQuote.PublishDate = time.Now()
 	newQuote.UserId = userId
@@ -155,7 +163,7 @@ func Login(c *gin.Context, userDao users.UserDao) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub":  currentUserFromDb.Id,
 		"name": currentUserFromDb.Name,
-		"exp": time.Now().Add(time.Hour).Unix(),
+		"exp":  time.Now().Add(time.Hour).Unix(),
 	})
 
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
