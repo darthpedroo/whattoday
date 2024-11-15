@@ -45,10 +45,11 @@ func main() {
 	router.GET("/quotes", func(c *gin.Context) {
 		getQuotes(c, quotesSqlite)
 	})
-	router.POST("quotes", func(c *gin.Context) {
+	router.POST("/quotes", func(c *gin.Context) {
 		addQuote(c, quotesSqlite)
 	})
-	router.POST("users", func(c *gin.Context) {
+	router.POST("/users", func(c *gin.Context) {
+		addUser(c, usersSqlite)
 
 	})
 
@@ -78,4 +79,24 @@ func addQuote(c *gin.Context, quotesDao quotes.QuotesDao) {
 		return
 	}
 	c.IndentedJSON(http.StatusCreated, newQuote)
+}
+
+func addUser(c *gin.Context, userDao users.UserDao){ 
+
+	var newUser users.User
+
+	userIP := c.ClientIP()
+
+	fmt.Println(userIP)
+
+
+	if err := c.BindJSON(&newUser); err != nil {
+		return
+	}
+
+	if err := userDao.AddUser(newUser); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusCreated, newUser)
 }

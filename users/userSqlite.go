@@ -2,7 +2,9 @@ package users
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"time"
 )
 
 type UserSqlite struct {
@@ -52,6 +54,46 @@ func (u UserSqlite) AddUser(user User) error {
 		return err
 	}
 	return nil
+}
+
+func UserCanPost(db *sql.DB, userId int) (bool, time.Duration, error) {
+
+	row, err := db.Query(`SELECT q.publishDate FROM users u
+								JOIN quotes q ON u.id = q.userId
+								WHERE q.userId = ?
+								order by q.publishDate DESC
+								limit 1;
+								
+							`, userId)
+
+	if err != nil {
+		log.Fatal(err)
+		return false, 0, err
+	}
+	var publishDate time.Time //This stores the last published date
+	for row.Next() {
+		fmt.Println("LAST POST:")
+
+		err := row.Scan(&publishDate)
+
+		if err != nil {
+			return false, 0, err
+		}
+
+		fmt.Println(publishDate)
+	}
+
+	currentTime := time.Now()
+
+	expectedTime := publishDate.AddDate(0, 0, 1)
+
+	hoursUntilNextPost := expectedTime.Sub(currentTime)
+
+	canPost := hoursUntilNextPost < 0
+
+	defer row.Close()
+	return canPost, hoursUntilNextPost, nil
+
 }
 
 func (u UserSqlite) CreateTable() {

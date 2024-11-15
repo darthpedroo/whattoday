@@ -2,7 +2,9 @@ package quotes
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"whattoday/web-service-gin/users"
 )
 
 type QuotesSqlite struct {
@@ -41,6 +43,17 @@ func (q QuotesSqlite) GetQuotes() ([]Quote, error) {
 
 func (q QuotesSqlite) AddQuote(quote Quote) error {
 	db := q.db
+
+	canPost, hoursUntilNextPost, err := users.UserCanPost(db, quote.UserId)
+	
+	fmt.Println("CAN POST: ")
+	fmt.Println(canPost)
+	fmt.Println("HOURS UNTIL NEXT POST")
+	fmt.Println(hoursUntilNextPost)
+
+	if !canPost {
+		return fmt.Errorf("user cannot post yet, hours till next post: %v", hoursUntilNextPost)
+	}
 
 	stmt, err := db.Prepare(`INSERT INTO quotes (text, userId, publishDate)  VALUES (?,?,?)`)
 
