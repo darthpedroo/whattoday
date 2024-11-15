@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"whattoday/web-service-gin/middleware"
 	"whattoday/web-service-gin/quotes"
 	"whattoday/web-service-gin/users"
 
@@ -48,12 +49,14 @@ func main() {
 		getQuotes(c, quotesSqlite)
 	})
 	router.POST("/quotes", func(c *gin.Context) {
+		middleware.RequireAuth(usersSqlite)(c) // Call RequireAuth with userDao, passing c
 		addQuote(c, quotesSqlite)
 	})
+
 	router.POST("/users", func(c *gin.Context) {
 		addUser(c, usersSqlite)
 	})
-	router.POST("login", func(c* gin.Context) {
+	router.POST("/login", func(c *gin.Context) {
 		Login(c, usersSqlite)
 	})
 
@@ -71,12 +74,38 @@ func getQuotes(c *gin.Context, quotesDao quotes.QuotesDao) {
 
 func addQuote(c *gin.Context, quotesDao quotes.QuotesDao) {
 
+	// Retrieve the user from the context
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Print the value and type of the user to debug
+	fmt.Printf("user: %v\n", user)        // Prints the user data
+	fmt.Printf("user type: %T\n", user)   // Prints the actual type of user
+
+	// Type assert the user to a pointer of your User struct
+	authenticatedUser, ok := user.(users.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User data is incorrect"})
+		return
+	}
+
+	// Now you can access the UserId (or Id in your case)
+	userId := authenticatedUser.Id
+	fmt.Println("Authenticated UserId:", userId)
+
+
 	var newQuote quotes.Quote
 	if err := c.BindJSON(&newQuote); err != nil {
 		return
 	}
 
+	
+
 	newQuote.PublishDate = time.Now()
+	newQuote.UserId = userId
 
 	if err := quotesDao.AddQuote(newQuote); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -131,9 +160,10 @@ func Login(c *gin.Context, userDao users.UserDao) {
 	// Generate  a jwt token
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": currentUserFromDb.Id,
+		"sub":  currentUserFromDb.Id,
 		"name": currentUserFromDb.Name,
-		"exp:": time.Now().Add(time.Hour).Unix(),
+		"password": currentUserFromDb.Password,
+		"exp": time.Now().Add(time.Hour).Unix(),
 	})
 
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
@@ -144,7 +174,7 @@ func Login(c *gin.Context, userDao users.UserDao) {
 	}
 
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("Authorization", tokenString,3600,"","",false,true)
+	c.SetCookie("Authorization", tokenString, 3600, "", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": tokenString,
