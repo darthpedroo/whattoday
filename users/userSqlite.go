@@ -83,6 +83,31 @@ func (u UserSqlite) GetUser(userId int) (User, error) {
 
 }
 
+func (u UserSqlite) GetUserFromName(userName string) (User, error){
+
+	db := u.db
+	row, err := db.Query(`SELECT * FROM users where name = ?`, userName)
+	
+	var user User
+	for row.Next() {
+		
+
+		if err := row.Scan(&user.Id, &user.Name, &user.Password); err != nil {
+			log.Printf("Error scanning User: %v", err)
+			return User{}, err
+		}
+	}
+
+	if err != nil {
+		log.Fatal(err)
+		return User{}, err
+	}
+	return user, nil
+
+}
+
+
+
 func UserCanPost(db *sql.DB, userId int) (bool, time.Duration, error) {
 
 	row, err := db.Query(`SELECT q.publishDate FROM users u

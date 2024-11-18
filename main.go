@@ -47,7 +47,8 @@ func main() {
 
 	router := gin.Default()
 	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true
+	
+	config.AllowOrigins = []string{"http://localhost:5500"} // Specify the exact origin
 	config.AllowMethods = []string{"POST", "GET", "PUT", "OPTIONS"}
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept", "User-Agent", "Cache-Control", "Pragma"}
 	config.ExposeHeaders = []string{"Content-Length"}
@@ -64,7 +65,7 @@ func main() {
 		addQuote(c, quotesSqlite)
 	})
 
-	router.POST("/users", func(c *gin.Context) {
+	router.POST("/sign-up", func(c *gin.Context) {
 		addUser(c, usersSqlite)
 	})
 	router.POST("/login", func(c *gin.Context) {
@@ -140,7 +141,7 @@ func Login(c *gin.Context, userDao users.UserDao) {
 	}
 
 	// look up requested user
-	currentUserFromDb, err := userDao.GetUser(newUser.Id)
+	currentUserFromDb, err := userDao.GetUserFromName(newUser.Name)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -173,8 +174,16 @@ func Login(c *gin.Context, userDao users.UserDao) {
 		return
 	}
 
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("Authorization", tokenString, 3600, "", "", false, true)
+	c.SetSameSite(http.SameSiteNoneMode) // Allows cross-origin cookies
+	c.SetCookie(
+			"Authorization", // Cookie name
+			tokenString,           // Cookie value
+			3600,            // Expiry time in seconds
+			"/",             // Path
+			"localhost",     // Domain
+			true,           // Secure (set to true for HTTPS)
+			true,            // HttpOnly
+		)
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": tokenString,
