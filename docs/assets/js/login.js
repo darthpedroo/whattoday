@@ -1,3 +1,5 @@
+import { API_DOMAIN } from './config.js'
+
 document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
 
@@ -10,7 +12,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
   errorMessage.classList.add('hidden');
 
   try {
-    const response = await fetch('http://localhost:8080/login', {
+    const response = await fetch(`${API_DOMAIN}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

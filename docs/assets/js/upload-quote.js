@@ -1,3 +1,5 @@
+import { API_DOMAIN } from './config.js'
+
 document.addEventListener('DOMContentLoaded', async () => {
   // Check if the user is logged in by verifying the JWT from cookies
   const isLoggedIn = await checkLoginStatus();
@@ -24,7 +26,7 @@ document.getElementById('post-form').addEventListener('submit', async (e) => {
   successMessage.classList.add('hidden');
 
   try {
-    const response = await fetch('http://localhost:8080/quotes', {
+    const response = await fetch(`${API_DOMAIN}/quotes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -36,6 +38,7 @@ document.getElementById('post-form').addEventListener('submit', async (e) => {
     if (response.ok) {
       const data = await response.json();
       console.log('Created Post:', data);
+      window.location.href = 'quotes.html'
 
       // Show success message
       successMessage.classList.remove('hidden');

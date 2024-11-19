@@ -3,18 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
+  <title>Signup</title>
   <link rel="stylesheet" href="assets/css/style.css">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 flex justify-center items-center min-h-screen mt-16">
   <div id="navbar-container"></div>
   
-  <!-- Login Form Container -->
+  <!-- Signup Form Container -->
   <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
-    <h2 class="text-3xl font-bold text-indigo-600 text-center mb-6">Login</h2>
+    <h2 class="text-3xl font-bold text-indigo-600 text-center mb-6">Sign Up</h2>
 
-    <form id="login-form" class="space-y-6">
+    <!-- Signup Form -->
+    <form id="signup-form" class="space-y-6">
       <div>
         <label for="name" class="block text-gray-700 text-sm font-medium">Name</label>
         <input type="text" id="name" name="name" required
@@ -26,28 +27,25 @@
         <input type="password" id="password" name="password" required
           class="mt-2 p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your password">
       </div>
-
+      
       <button type="submit"
         class="w-full py-3 mt-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        Login
+        Sign Up
       </button>
     </form>
 
     <!-- Custom Error Message -->
     <div id="error-message" class="hidden text-red-500 bg-red-100 border-l-4 border-red-500 p-4 mt-4" role="alert">
       <strong class="font-bold">Error:</strong>
-      <span id="error-text">Invalid credentials. Please try again.</span>
+      <span id="error-text">Signup failed. Please try again.</span>
     </div>
 
     <div class="text-center mt-4">
-      <p class="text-sm text-gray-600">Don't have an account? <a href="/frontend/signup.html" class="text-indigo-600 hover:text-indigo-500">Sign up</a></p>
+      <p class="text-sm text-gray-600">Already have an account? <a href="login.html" class="text-indigo-600 hover:text-indigo-500">Login</a></p>
     </div>
   </div>
 
-  <script src="assets/js/login.js"></script>
-  <script src="assets/js/loadNavbar.js"></script>
+  <script type="module" src="assets/js/signup.js"></script>
+  <script type="module" src="assets/js/loadNavbar.js"></script>
 </body>
-
-
-
 </html>

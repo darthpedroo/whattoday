@@ -1,3 +1,5 @@
+import { API_DOMAIN } from './config.js'
+
 document.getElementById('signup-form').addEventListener('submit', async (e) => {
   e.preventDefault(); // Prevent the default form submission
 
@@ -11,7 +13,7 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
 
   try {
     // First, signup the user
-    const signupResponse = await fetch('http://localhost:8080/sign-up', {
+    const signupResponse = await fetch(`${API_DOMAIN}/sign-up`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -21,8 +23,9 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
 
     if (signupResponse.ok) {
       console.log("Signup successful, proceeding to login...");
-      // Ensure login is awaited after signup success
+        // Ensure login is awaited after signup success
       const loginResponse = await loginUser(name, password); // Await login function
+      window.location.href = 'quote.html'
       if (loginResponse) {
         console.log("Login was successful, redirecting...");
         // Show success message and redirect
@@ -45,7 +48,7 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
 async function loginUser(name, password) {
   console.log("Attempting to login...");
   try {
-    const loginResponse = await fetch('http://localhost:8080/login', {
+    const loginResponse = await fetch(`${API_DOMAIN}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

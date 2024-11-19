@@ -1,3 +1,5 @@
+import { API_DOMAIN } from './config.js'
+
 // Combine both navbar and quotes loading into one function
 window.onload = async () => {
   await loadNavbar();  // Load the navbar first
@@ -32,7 +34,7 @@ async function loadQuotes() {
 // Fetch the quotes from the API
 async function fetchQuotes() {
   try {
-    const response = await fetch('http://localhost:8080/quotes');
+    const response = await fetch(`${API_DOMAIN}/quotes`);
     if (response.ok) {
       return await response.json();
     }
