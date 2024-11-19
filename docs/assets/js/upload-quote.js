@@ -83,6 +83,8 @@ function getJWTFromCookies() {
   // Find the cookie named 'Authorization' and return its value
   for (let cookie of cookies) {
     cookie = cookie.trim(); // Remove leading spaces
+    console.log(cookie)
+    console.log("caca")
     if (cookie.startsWith('Authorization=')) {
       return cookie.substring('Authorization='.length); // Return the JWT token
     }
