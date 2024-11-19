@@ -72,8 +72,13 @@ func main() {
 		Login(c, usersSqlite)
 	})
 
-	router.Run("localhost:8080")
-}
+	port := os.Getenv("PORT")
+	if port == "" {
+	    port = "8080" // Fallback en caso de que no esté definida
+	}
+	router.Run(":" + port)
+	
+	}
 
 func getQuotes(c *gin.Context, quotesDao quotes.QuotesDao) {
 	quotes, err := quotesDao.GetQuotes()
