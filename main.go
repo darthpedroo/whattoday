@@ -194,7 +194,7 @@
 				tokenString,       // Cookie value
 				3600,              // Expiry time in seconds
 				"/",               // Path
-				"darthpedroo.github.io",      // Domain
+				"",      // Domain
 				true,              // Secure
 				false,             // HttpOnly
 			)
