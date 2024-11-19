@@ -93,10 +93,14 @@
 	}
 
 	func addQuote(c *gin.Context, quotesDao quotes.QuotesDao) {
+		
+		for key, value := range c.Keys {
+			fmt.Printf("Key: %s, Value: %v\n", key, value)
+		}
 
 		user, exists := c.Get("user")
 		if !exists {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found. Can't be authorized to post!"})
 			return
 		}
 
@@ -156,10 +160,6 @@
 			return
 		}
 
-		//Compare sent in pass with saved user pass hash
-		fmt.Println("XD")
-		fmt.Println(currentUserFromDb.Password)
-
 		err = bcrypt.CompareHashAndPassword([]byte(currentUserFromDb.Password), []byte(newUser.Password))
 
 		if err != nil {
@@ -181,35 +181,6 @@
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-
-		c.SetSameSite(http.SameSiteNoneMode) // Allows cross-origin cookies
-	
-//		environment := os.Getenv("APP_ENV") // Get the environment from the environment variable
-//		if environment == "production" {
-//			fmt.Println("xd?")
-//			c.SetSameSite(http.SameSiteNoneMode) // Required for cross-origin cookies
-//			c.SetCookie(
-//				"Authorization",   // Cookie name
-//				tokenString,       // Cookie value
-//				3600,              // Expiry time in seconds
-//				"/",               // Path
-//				"",      // Domain
-//				true,              // Secure
-//				false,             // HttpOnly
-//			)
-//		} else {
-//			fmt.Println("holii")
-//			c.SetSameSite(http.SameSiteLaxMode) // More relaxed in development
-//			c.SetCookie(
-//				"Authorization",   // Cookie name
-//				tokenString,       // Cookie value
-//				3600,              // Expiry time in seconds
-//				"/",               // Path
-//				"localhost",       // Domain for local development
-//				false,             // Non-secure in development (no HTTPS)
-//				false,              // HttpOnly
-//			)
-//		}
 
 		c.JSON(http.StatusOK, gin.H{
 			"token": tokenString,
