@@ -184,33 +184,32 @@
 
 		c.SetSameSite(http.SameSiteNoneMode) // Allows cross-origin cookies
 	
-		environment := os.Getenv("APP_ENV") // Get the environment from the environment variable
-
-		if environment == "production" {
-			fmt.Println("xd?")
-			c.SetSameSite(http.SameSiteNoneMode) // Required for cross-origin cookies
-			c.SetCookie(
-				"Authorization",   // Cookie name
-				tokenString,       // Cookie value
-				3600,              // Expiry time in seconds
-				"/",               // Path
-				"",      // Domain
-				true,              // Secure
-				false,             // HttpOnly
-			)
-		} else {
-			fmt.Println("holii")
-			c.SetSameSite(http.SameSiteLaxMode) // More relaxed in development
-			c.SetCookie(
-				"Authorization",   // Cookie name
-				tokenString,       // Cookie value
-				3600,              // Expiry time in seconds
-				"/",               // Path
-				"localhost",       // Domain for local development
-				false,             // Non-secure in development (no HTTPS)
-				false,              // HttpOnly
-			)
-		}
+//		environment := os.Getenv("APP_ENV") // Get the environment from the environment variable
+//		if environment == "production" {
+//			fmt.Println("xd?")
+//			c.SetSameSite(http.SameSiteNoneMode) // Required for cross-origin cookies
+//			c.SetCookie(
+//				"Authorization",   // Cookie name
+//				tokenString,       // Cookie value
+//				3600,              // Expiry time in seconds
+//				"/",               // Path
+//				"",      // Domain
+//				true,              // Secure
+//				false,             // HttpOnly
+//			)
+//		} else {
+//			fmt.Println("holii")
+//			c.SetSameSite(http.SameSiteLaxMode) // More relaxed in development
+//			c.SetCookie(
+//				"Authorization",   // Cookie name
+//				tokenString,       // Cookie value
+//				3600,              // Expiry time in seconds
+//				"/",               // Path
+//				"localhost",       // Domain for local development
+//				false,             // Non-secure in development (no HTTPS)
+//				false,              // HttpOnly
+//			)
+//		}
 
 		c.JSON(http.StatusOK, gin.H{
 			"token": tokenString,

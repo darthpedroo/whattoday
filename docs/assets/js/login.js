@@ -1,4 +1,4 @@
-import { API_DOMAIN } from './config.js'
+import { loginUser } from './auth.js';
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -6,32 +6,15 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
   const name = document.getElementById('name').value;
   const password = document.getElementById('password').value;
 
-  // Hide any previous error message
-  const errorMessage = document.getElementById('error-message');
-  const errorText = document.getElementById('error-text');
-  errorMessage.classList.add('hidden');
+  const loginResponse = await loginUser(name, password);
 
-  try {
-    const response = await fetch(`${API_DOMAIN}/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include', // Include cookies in the request
-      body: JSON.stringify({ name, password }),
-    });
-
-    if (response.ok) {
-      // Redirect on successful login
-      window.location.href = 'quote.html'; // Redirect to another page
-    } else {
-      // Show error message if login fails
-      errorText.textContent = 'Invalid credentials. Please try again.';
-      errorMessage.classList.remove('hidden');
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    errorText.textContent = 'An error occurred. Please try again.';
+  if (loginResponse) {
+    console.log("Login successful, redirecting...");
+    window.location.href = 'quote.html';
+  } else {
+    const errorMessage = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+    errorText.textContent = 'Login failed. Please try again.';
     errorMessage.classList.remove('hidden');
   }
 });
