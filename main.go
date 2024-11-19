@@ -194,9 +194,9 @@
 				tokenString,       // Cookie value
 				3600,              // Expiry time in seconds
 				"/",               // Path
-				"darthpedroo.github.io",   // Domain for production
-				true,              // Secure (make sure HTTPS is enabled)
-				false,              // HttpOnly (helps protect from XSS)
+				".github.io",      // Domain
+				true,              // Secure
+				false,             // HttpOnly
 			)
 		} else {
 			fmt.Println("holii")
