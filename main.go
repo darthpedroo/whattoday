@@ -182,11 +182,12 @@ func Login(c *gin.Context, userDao users.UserDao) {
 			"/",             // Path
 			"localhost",     // Domain
 			true,           // Secure (set to true for HTTPS)
-			true,            // HttpOnly
+			false,            // HttpOnly
 		)
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": tokenString,
 	})
+	fmt.Println("set the cookie :V")
 
 }

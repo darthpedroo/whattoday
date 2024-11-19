@@ -24,8 +24,12 @@ func (q QuotesSqlite) GetQuotes() ([]CustomQuoteResponse, error) {
 	//var quotes = make([]Quote, 0)
 	//var usersList = make([]users.User, 0)
 
-	rows, err := db.Query(`select q.id,q.text,q.publishDate,q.userId, u.id, u.name from quotes q 
-						join users u on q.userId = u.id `)
+	rows, err := db.Query(`
+  SELECT q.id, q.text, q.publishDate, q.userId, u.id, u.name 
+  FROM quotes q 
+  JOIN users u ON q.userId = u.id 
+  ORDER BY q.publishDate DESC
+`)
 
 	var response []CustomQuoteResponse
 
@@ -65,7 +69,7 @@ func (q QuotesSqlite) AddQuote(quote Quote) error {
 	canPost, hoursUntilNextPost, err := users.UserCanPost(db, quote.UserId)
 
 	if !canPost {
-		return fmt.Errorf("user cannot post yet, hours till next post: %v", hoursUntilNextPost)
+		return fmt.Errorf("You only have one post per day! You can post again in: %v", hoursUntilNextPost)
 	}
 
 	stmt, err := db.Prepare(`INSERT INTO quotes (text, userId, publishDate)  VALUES (?,?,?)`)
