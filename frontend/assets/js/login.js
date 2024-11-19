@@ -4,6 +4,11 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
   const name = document.getElementById('name').value;
   const password = document.getElementById('password').value;
 
+  // Hide any previous error message
+  const errorMessage = document.getElementById('error-message');
+  const errorText = document.getElementById('error-text');
+  errorMessage.classList.add('hidden');
+
   try {
     const response = await fetch('http://localhost:8080/login', {
       method: 'POST',
@@ -15,15 +20,16 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     });
 
     if (response.ok) {
-        console.log("EXXXXXXXXXXXXD")
-        console.log(response)
-      alert('Login successful!');
-      window.location.href = 'quotes.html'; // Redirect to another page
+      // Redirect on successful login
+      window.location.href = 'quote.html'; // Redirect to another page
     } else {
-      alert('Invalid credentials. Please try again.');
+      // Show error message if login fails
+      errorText.textContent = 'Invalid credentials. Please try again.';
+      errorMessage.classList.remove('hidden');
     }
   } catch (error) {
     console.error('Error:', error);
-    alert('An error occurred. Please try again.');
+    errorText.textContent = 'An error occurred. Please try again.';
+    errorMessage.classList.remove('hidden');
   }
 });

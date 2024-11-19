@@ -4,16 +4,68 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Post</title>
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-  <h1>Create a New Post</h1>
-  <form id="post-form">
-    <label for="content">Content:</label>
-    <textarea id="content" name="content" rows="5" placeholder="Write your post content here..." required></textarea>
-    <button type="submit">Post</button>
-  </form>
+<body class="bg-gray-100 font-poppins">
+
+  <div id="navbar-container"></div>
+
+  <div class="flex justify-center items-center min-h-screen">
+
+    <!-- Main Form Container -->
+    <div class="bg-white p-10 rounded-3xl shadow-2xl w-full sm:w-96">
+
+      <h1 class="text-4xl font-semibold text-gray-800 mb-8 text-center">Create a New Post</h1>
+
+      <!-- Error Message for Not Logged In -->
+      <div id="login-message" class="hidden text-red-500 text-sm mt-4 p-4 bg-red-100 border border-red-300 rounded-lg">
+        <span>You need to be logged in to create a post.</span>
+        
+        <!-- Redirect Buttons below the Error Message -->
+        <div class="mt-4 flex justify-center gap-4">
+          <a href="/frontend/login.html" class="text-indigo-600 hover:text-indigo-500">
+            <button id="login-redirect" class="w-full py-3 px-6 text-white bg-gradient-to-r from-blue-400 to-blue-600 rounded-full hover:from-blue-500 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transform hover:scale-105 transition duration-300 ease-in-out shadow-lg">
+              Log In
+            </button>
+          </a>
+          
+          <a href="/frontend/signup.html" class="text-indigo-600 hover:text-indigo-500">
+            <button id="signup-redirect" class="w-full py-3 px-6 text-white bg-gradient-to-r from-green-400 to-green-600 rounded-full hover:from-green-500 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transform hover:scale-105 transition duration-300 ease-in-out shadow-lg">
+              Sign Up
+            </button>
+          </a>
+        </div>
+      </div>
+
+      <!-- Post Form -->
+      <form id="post-form" class="space-y-6 hidden">
+        <div>
+          <textarea id="content" name="content" rows="5" placeholder="Write your post content here..." required class="w-full p-4 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300 ease-in-out shadow-md"></textarea>
+        </div>
+
+        <!-- Error Message for Form -->
+        <div id="error-message" class="hidden text-red-500 text-sm mt-4 p-2 bg-red-100 border border-red-300 rounded-lg">
+          <span id="error-text">Error message will appear here.</span>
+        </div>
+
+        <!-- Success Message -->
+        <div id="success-message" class="hidden text-green-500 text-sm mt-4 p-2 bg-green-100 border border-green-300 rounded-lg">
+          Post created successfully!
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="w-full py-3 px-6 text-white bg-gradient-to-r from-blue-400 to-blue-600 rounded-full hover:from-blue-500 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transform hover:scale-105 transition duration-300 ease-in-out shadow-lg">
+          Post
+        </button>
+        
+      </form>
+      
+    </div>
+    
+  </div>
 
   <script src="assets/js/upload-quote.js"></script>
+  <script src="assets/js/loadNavbar.js"></script>
+
 </body>
 </html>

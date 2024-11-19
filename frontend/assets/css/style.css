@@ -1,7 +1,16 @@
+/* styles.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
-    font-family: Arial, sans-serif;
-  }
-  
+  background-color: #f7fafc; /* Equivalent to bg-gray-100 */
+  display: flex;
+  min-height: 100vh; /* Equivalent to min-h-screen */
+  padding-top: 4rem; /* Equivalent to mt-16, ensuring space for the navbar */
+  margin: 0;
+}
+
   .quote-container {
     margin-top: 20px;
   }
