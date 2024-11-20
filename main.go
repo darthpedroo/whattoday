@@ -93,6 +93,10 @@
 	}
 
 	func addQuote(c *gin.Context, quotesDao quotes.QuotesDao) {
+
+		fmt.Printf("Printf without newline") // May not flush
+		fmt.Printf("Printf with newline\n")  // Should flush
+		fmt.Println("Println with newline")  // Always flushes
 		
 		for key, value := range c.Keys {
 			fmt.Println("Key: %s, Value: %v\n", key, value)
