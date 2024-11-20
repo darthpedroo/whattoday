@@ -95,12 +95,12 @@
 	func addQuote(c *gin.Context, quotesDao quotes.QuotesDao) {
 		
 		for key, value := range c.Keys {
-			fmt.Printf("Key: %s, Value: %v\n", key, value)
+			fmt.Println("Key: %s, Value: %v\n", key, value)
 		}
 
-		user, exists := c.Get("user")
+		user, exists := c.Get("ucacser")
 		if !exists {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found. Can't be authorized to post!"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": c.Keys})
 			return
 		}
 
