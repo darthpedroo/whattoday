@@ -93,44 +93,61 @@
 	}
 
 	func addQuote(c *gin.Context, quotesDao quotes.QuotesDao) {
-
-		fmt.Printf("Printf without newline") // May not flush
-		fmt.Printf("Printf with newline\n")  // Should flush
-		fmt.Println("Println with newline")  // Always flushes
-		
-		for key, value := range c.Keys {
-			fmt.Println("Key: %s, Value: %v\n", key, value)
-		}
-
-		user, exists := c.Get("ucacser")
-		if !exists {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": c.Keys})
+		// Retrieve the JWT token from the "Authorization" header
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization token is missing"})
 			return
 		}
-
-		authenticatedUser, ok := user.(users.User)
+		fmt.Println(authHeader)
+		fmt.Println("XD")
+		// Parse and validate the JWT token
+		token, err := jwt.Parse(authHeader, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			}
+			return []byte(os.Getenv("SECRET")), nil
+		})
+	
+		if err != nil || !token.Valid {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			return
+		}
+	
+		// Extract user data from token claims
+		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "User data is incorrect"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
 			return
 		}
-
-		userId := authenticatedUser.Id
-		fmt.Println("Authenticated UserId:", userId)
-
+	
+		userIdFloat, ok := claims["sub"].(float64)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID in token"})
+			return
+		}
+		userId := int(userIdFloat)
+	
+		// Simulate fetching user object (or skip if not needed)
+		//authenticatedUser := users.User{Id: userId}
+		//fmt.Println("Authenticated UserId:", userId)
+	
 		var newQuote quotes.Quote
 		if err := c.BindJSON(&newQuote); err != nil {
 			return
 		}
-
+	
 		newQuote.PublishDate = time.Now()
 		newQuote.UserId = userId
-
+	
 		if err := quotesDao.AddQuote(newQuote); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+	
 		c.IndentedJSON(http.StatusCreated, newQuote)
 	}
+	
 
 	func addUser(c *gin.Context, userDao users.UserDao) {
 
