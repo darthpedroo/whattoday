@@ -28,7 +28,7 @@
 
 		err = godotenv.Load()
 		if err != nil {
-			log.Fatalf("Error loading .env file: %v", err)
+			fmt.Println("No se encontró el archivo .env")
 		}
 
 		// Test the connection
