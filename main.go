@@ -15,6 +15,7 @@
 		"github.com/gin-gonic/gin"
 		"github.com/golang-jwt/jwt/v5"
 		"golang.org/x/crypto/bcrypt"
+		"github.com/joho/godotenv"
 		_ "modernc.org/sqlite"
 	)
 
@@ -25,20 +26,23 @@
 			log.Fatal(err)
 		}
 
+		err = godotenv.Load()
+		if err != nil {
+			log.Fatalf("Error loading .env file: %v", err)
+		}
+
 		// Test the connection
 		err = db.Ping()
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		fmt.Println("Connected to SQLite database!")
 		return db
 	}
 
 	func main() {
 		db := connectDb()
 		defer db.Close()
-		fmt.Println(db)
 
 		quotesSqlite := quotes.NewQuotesSqlite(db)
 		quotesSqlite.CreateTable()
@@ -88,7 +92,6 @@
 		if err != nil {
 			log.Fatal(err)
 		}
-		//fmt.Print(quotes)
 		c.IndentedJSON(http.StatusOK, quotes)
 	}
 
@@ -99,8 +102,6 @@
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization token is missing"})
 			return
 		}
-		fmt.Println(authHeader)
-		fmt.Println("XD")
 		// Parse and validate the JWT token
 		token, err := jwt.Parse(authHeader, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -130,7 +131,6 @@
 	
 		// Simulate fetching user object (or skip if not needed)
 		//authenticatedUser := users.User{Id: userId}
-		//fmt.Println("Authenticated UserId:", userId)
 	
 		var newQuote quotes.Quote
 		if err := c.BindJSON(&newQuote); err != nil {
@@ -206,6 +206,5 @@
 		c.JSON(http.StatusOK, gin.H{
 			"token": tokenString,
 		})
-		fmt.Println("set the cookie :V")
 
 	}

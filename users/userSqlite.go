@@ -2,7 +2,6 @@ package users
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"time"
 
@@ -64,10 +63,9 @@ func (u UserSqlite) GetUser(userId int) (User, error) {
 
 	db := u.db
 	row, err := db.Query(`SELECT * FROM users where id = ?`, userId)
-	
+
 	var user User
 	for row.Next() {
-		
 
 		if err := row.Scan(&user.Id, &user.Name, &user.Password); err != nil {
 			log.Printf("Error scanning User: %v", err)
@@ -83,14 +81,13 @@ func (u UserSqlite) GetUser(userId int) (User, error) {
 
 }
 
-func (u UserSqlite) GetUserFromName(userName string) (User, error){
+func (u UserSqlite) GetUserFromName(userName string) (User, error) {
 
 	db := u.db
 	row, err := db.Query(`SELECT * FROM users where name = ?`, userName)
-	
+
 	var user User
 	for row.Next() {
-		
 
 		if err := row.Scan(&user.Id, &user.Name, &user.Password); err != nil {
 			log.Printf("Error scanning User: %v", err)
@@ -105,8 +102,6 @@ func (u UserSqlite) GetUserFromName(userName string) (User, error){
 	return user, nil
 
 }
-
-
 
 func UserCanPost(db *sql.DB, userId int) (bool, time.Duration, error) {
 
@@ -124,7 +119,6 @@ func UserCanPost(db *sql.DB, userId int) (bool, time.Duration, error) {
 	}
 	var publishDate time.Time //This stores the last published date
 	for row.Next() {
-		fmt.Println("LAST POST:")
 
 		err := row.Scan(&publishDate)
 
@@ -132,7 +126,6 @@ func UserCanPost(db *sql.DB, userId int) (bool, time.Duration, error) {
 			return false, 0, err
 		}
 
-		fmt.Println(publishDate)
 	}
 
 	currentTime := time.Now()

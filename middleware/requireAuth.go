@@ -33,9 +33,6 @@ func RequireAuth(userDao users.UserDao) gin.HandlerFunc {
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			// Check expiration
-			fmt.Println("claims")
-			fmt.Println(claims)
-			fmt.Println("claims")
 			if float64(time.Now().Unix()) > claims["exp"].(float64) {
 				c.AbortWithStatus(http.StatusUnauthorized)
 				return
